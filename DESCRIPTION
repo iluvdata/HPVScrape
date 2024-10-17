@@ -1,0 +1,14 @@
+Package: hpvscrape
+Type: Package
+Title: HPV Scrape Library
+Description: Tools to scrape HPV test result pdfs, reinterpret (optional) to dataframes
+Version: 0.7
+Encoding: UTF-8
+Author: Grant Ellsworth <gre9006@med.cornell.edu>
+Maintainer: Grant Ellsworth <gre9006@med.cornell.edu>
+License: GPL-3
+Imports: pdftools, assertthat, stringr, R6, readr, dplyr
+URL: https://github.com/iluvdata/hpvscrap
+BugReports: https://github.com/iluvdata/hpvscrape/issues
+RoxygenNote: 7.3.2
+Roxygen: list(markdown = TRUE)
