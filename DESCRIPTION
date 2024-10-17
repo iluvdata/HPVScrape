@@ -8,7 +8,7 @@ Author: Grant Ellsworth <gre9006@med.cornell.edu>
 Maintainer: Grant Ellsworth <gre9006@med.cornell.edu>
 License: GPL-3
 Imports: pdftools, assertthat, stringr, R6, readr, dplyr
-URL: https://github.com/iluvdata/hpvscrap
+URL: https://github.com/iluvdata/hpvscrap, https://iluvdata.github.io/HPVScrape/
 BugReports: https://github.com/iluvdata/hpvscrape/issues
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)

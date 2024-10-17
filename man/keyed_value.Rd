@@ -14,7 +14,9 @@ keyed_ts(key, txt, tz, machine_name)
 
 \item{txt}{source of extraction}
 
-\item{tz}{Olson Name tz of value}
+\item{tz}{\link{TZ} object containing either single time zone of map of time zones and machine names}
+
+\item{machine_name}{the identifier used to lookup the time zone}
 }
 \value{
 the value after the key

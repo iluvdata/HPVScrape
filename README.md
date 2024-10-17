@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is a tool use to scrape Xpert HPV pdf reports and return the data as a formatted data frame of S3 class `xpert_results.`
+This is a tool use to scrape Xpert HPV pdf reports and return the data as a formatted data frame of S3 class `xpert_results`.
 
 ## Usage
 

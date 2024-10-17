@@ -96,7 +96,8 @@ keyed_value <- function(key, txt) {
 }
 
 #' @rdname keyed_value
-#' @param tz Olson Name tz of value
+#' @param tz [TZ] object containing either single time zone of map of time zones and machine names
+#' @param machine_name the identifier used to lookup the time zone
 keyed_ts <- function(key, txt, tz, machine_name) {
   browser()
   assertthat::assert_that(inherits(tz, "TZ"))
