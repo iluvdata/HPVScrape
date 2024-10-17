@@ -6,7 +6,7 @@ PDFTool <- R6::R6Class("PDFTool",
   public = list(
     #' @description Open pdf file for parsing
     #'
-    #' @param pdf a path to pdf or [base::raw] vector containing the pdf of test results
+    #' @param pdf a path to pdf or [raw] vector containing the pdf of test results
     #' @param start the string deliminating the start of a result
     #' @param end the string deliminating the end of a result
     #'

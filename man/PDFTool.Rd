@@ -27,7 +27,7 @@ Open pdf file for parsing
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{pdf}}{a path to pdf or \link[base:raw]{base::raw} vector containing the pdf of test results}
+\item{\code{pdf}}{a path to pdf or \link{raw} vector containing the pdf of test results}
 
 \item{\code{start}}{the string deliminating the start of a result}
 

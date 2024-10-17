@@ -4,6 +4,22 @@
 
 This is a tool use to scrape Xpert HPV pdf reports and return the data as a formatted data frame of S3 class `xpert_results`.
 
+## Installation
+
+The current package is not published to CRAN. You must install from github:
+
+``` r
+install.packages("remotes")
+remotes::install_github("iluvdata/HPVScrape")
+```
+
+Alternatively using [pak](https://pak.r-lib.org/):
+
+``` r
+install.packages("pak")
+pak::pkg_install("iluvdata/HPVScrape")
+```
+
 ## Usage
 
 ### Case 1: Xpert machine(s) all in the same time zone
