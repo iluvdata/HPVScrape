@@ -2,7 +2,7 @@ Package: hpvscrape
 Type: Package
 Title: HPV Scrape Library
 Description: Tools to scrape HPV test result pdfs, reinterpret (optional) to dataframes
-Version: 0.7
+Version: 0.7.1
 Encoding: UTF-8
 Author: Grant Ellsworth <gre9006@med.cornell.edu>
 Maintainer: Grant Ellsworth <gre9006@med.cornell.edu>
