@@ -11,7 +11,7 @@ hpvscrape is an R library to pull hpv test results from pdfs and return as dataf
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/iluvdata/hpvscrap}
+  \item \url{https://iluvdata.github.io/HPVScrape/}
   \item Report bugs at \url{https://github.com/iluvdata/hpvscrape/issues}
 }
 

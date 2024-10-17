@@ -1,10 +1,10 @@
-#' R6 Class to open and scrape PDF Files
+#' R6 Object to open and scrape PDF Files
 #'
 #' @description  Scrape text from PDF file, and manage that file
 
 PDFTool <- R6::R6Class("PDFTool",
   public = list(
-    #' Open pdf file for parsing
+    #' @description Open pdf file for parsing
     #'
     #' @param pdf a path to pdf or [base::raw] vector containing the pdf of test results
     #' @param start the string deliminating the start of a result
@@ -20,7 +20,7 @@ PDFTool <- R6::R6Class("PDFTool",
       private$results <- data.frame(start = which(start),
                                     end = which(private$pagesContaining(end)))
     },
-    #' Vector of results (combined)
+    #' @description Vector of results (combined)
     #' 
     #' @return vector of combined results
     getResults = \() {
@@ -32,7 +32,7 @@ PDFTool <- R6::R6Class("PDFTool",
       }
       results
     },
-    #' get specific pdf for a result
+    #' @description get specific pdf for a result
     #' 
     #' @param resNum integer of the result (index of `getResult()`)
     #' @param output path to where pdf will be written

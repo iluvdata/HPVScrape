@@ -2,10 +2,9 @@
 % Please edit documentation in R/pdftools.R
 \name{PDFTool}
 \alias{PDFTool}
-\title{R6 Class to open and scrape PDF Files}
+\title{R6 Object to open and scrape PDF Files}
 \description{
 Scrape text from PDF file, and manage that file
-Open pdf file for parsing
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -20,6 +19,7 @@ Open pdf file for parsing
 \if{html}{\out{<a id="method-PDFTool-new"></a>}}
 \if{latex}{\out{\hypertarget{method-PDFTool-new}{}}}
 \subsection{Method \code{new()}}{
+Open pdf file for parsing
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PDFTool$new(pdf, start, end)}\if{html}{\out{</div>}}
 }
@@ -37,26 +37,26 @@ Open pdf file for parsing
 }
 \subsection{Returns}{
 A new \code{PDFTool} object
-Vector of results (combined)
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PDFTool-getResults"></a>}}
 \if{latex}{\out{\hypertarget{method-PDFTool-getResults}{}}}
 \subsection{Method \code{getResults()}}{
+Vector of results (combined)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PDFTool$getResults()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 vector of combined results
-get specific pdf for a result
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PDFTool-getPDFs"></a>}}
 \if{latex}{\out{\hypertarget{method-PDFTool-getPDFs}{}}}
 \subsection{Method \code{getPDFs()}}{
+get specific pdf for a result
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PDFTool$getPDFs(resNum, output)}\if{html}{\out{</div>}}
 }
