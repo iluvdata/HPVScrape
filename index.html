@@ -29,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="index.html">hpvscrape</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,13 +63,25 @@
 <p>This is a tool use to scrape Xpert HPV pdf reports and return the data as a formatted data frame of S3 class <code>xpert_results</code>.</p>
 </div>
 <div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>The current package is not published to CRAN. You must install from github:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"iluvdata/HPVScrape"</span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively using <a href="https://pak.r-lib.org/" class="external-link">pak</a>:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pak"</span><span class="op">)</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pkg_install</a></span><span class="op">(</span><span class="st">"iluvdata/HPVScrape"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <div class="section level3">
 <h3 id="case-1-xpert-machines-all-in-the-same-time-zone">Case 1: Xpert machine(s) all in the same time zone<a class="anchor" aria-label="anchor" href="#case-1-xpert-machines-all-in-the-same-time-zone"></a>
 </h3>
 <p>To parse a pdf (which can contain multiple results) simple create a new <code>Xpert</code> object. You can pass either a path or a raw vector of the pdf binary.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Use OlsonNames() for a list of valid time zones</span></span>
 <span></span>
 <span><span class="va">xpert</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Xpert.html">Xpert</a></span><span class="op">(</span><span class="st">"myXpertResults.pdf"</span>, <span class="st">"America/New_York"</span><span class="op">)</span></span></code></pre></div>
@@ -78,7 +90,7 @@
 <h3 id="case-2-multiple-xpert-machines-in-various-time-zones">Case 2: Multiple Xpert machines in various time zones<a class="anchor" aria-label="anchor" href="#case-2-multiple-xpert-machines-in-various-time-zones"></a>
 </h3>
 <p>To parse a pdf first create a <code>TZ</code> object mapping the Xpert Instrument Serial Numbers to correct time zones.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tz</span> <span class="op">&lt;-</span> <span class="va"><a href="reference/TZ.html">TZ</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="st">"110016067"</span> <span class="op">=</span> <span class="st">"America/Sao_Paulo"</span>, <span class="st">"110016068"</span> <span class="op">=</span> <span class="st">"America/Mexico_City"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">xpert</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Xpert.html">Xpert</a></span><span class="op">(</span><span class="st">"myXpertResults.pdf"</span>, <span class="va">tz</span><span class="op">)</span></span></code></pre></div>
@@ -86,14 +98,14 @@
 <div class="section level3">
 <h3 id="get-results">Get Results<a class="anchor" aria-label="anchor" href="#get-results"></a>
 </h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">myResults</span> <span class="op">&lt;-</span> <span class="va">xpert</span><span class="op">$</span><span class="fu">getResults</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="get-pdf-for-a-result">Get PDF for a result<a class="anchor" aria-label="anchor" href="#get-pdf-for-a-result"></a>
 </h3>
 <p>To get the PDF for a row in the data frame returned from <code>Xpert$getResults()</code> just pass the row number to <code>Xpert$getPDFs()</code>. The second argument is a path to the output file</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pathToPDF</span> <span class="op">&lt;-</span> <span class="va">xpert</span><span class="op">$</span><span class="fu">getPDFs</span><span class="op">(</span><span class="fl">2</span>, <span class="st">"myResults.pdf"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
