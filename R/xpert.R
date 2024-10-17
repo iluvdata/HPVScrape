@@ -8,7 +8,8 @@ Xpert <- R6::R6Class("Xpert",
   public = list(
     #' @description Parse new pdf of xpert result(s)
     #'
-    #' @param pdf path to pdf or [raw] vector of pdf
+    #' @param pdf path to pdf or [raw] vector of pdf.  The pdf may contain a single or multiple results.  Only one pdf
+    #'        can be specified in the path
     #' @param xpertTZ timezone of xpert machine (see [OlsonNames()]) or [TZ] R6 object of machine mapped timezimes
     #'
     #' @importFrom magrittr %>%

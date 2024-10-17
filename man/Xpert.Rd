@@ -27,7 +27,8 @@ Parse new pdf of xpert result(s)
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{pdf}}{path to pdf or \link{raw} vector of pdf}
+\item{\code{pdf}}{path to pdf or \link{raw} vector of pdf.  The pdf may contain a single or multiple results.  Only one pdf
+can be specified in the path}
 
 \item{\code{xpertTZ}}{timezone of xpert machine (see \code{\link[=OlsonNames]{OlsonNames()}}) or \link{TZ} R6 object of machine mapped timezimes}
 }

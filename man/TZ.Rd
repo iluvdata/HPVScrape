@@ -27,7 +27,7 @@ Create a \code{TZ} object
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{...}}{either a character of a single time zone or mapped time zones i.e.
-\code{TZ$new("Xpert INSP" = "America/Mexico_City", "Brazil" = "America/Sao_Paulo")} where the names are the literal
+\code{TZ$new("110016067" = "America/Mexico_City", "110016068" = "America/Sao_Paulo")} where the names are the literal
 Xpert machine names on the generated reports and the time zones are one of \code{\link[=OlsonNames]{OlsonNames()}}}
 }
 \if{html}{\out{</div>}}
@@ -42,13 +42,13 @@ a TZ object
 \subsection{Method \code{getTZ()}}{
 Return a time zone string
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TZ$getTZ(device_name)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TZ$getTZ(device_names)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{device_name}}{the literal machine name for which you want to lookup a timezone.}
+\item{\code{device_names}}{the literal machine names for which you want to lookup a timezones.}
 }
 \if{html}{\out{</div>}}
 }

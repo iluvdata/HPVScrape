@@ -7,7 +7,7 @@
 \usage{
 keyed_value(key, txt)
 
-keyed_ts(key, txt, tz)
+keyed_ts(key, txt, tz, machine_name)
 }
 \arguments{
 \item{key}{key of value to extract}
