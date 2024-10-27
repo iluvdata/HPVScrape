@@ -7,13 +7,16 @@ PDFTool <- R6::R6Class("PDFTool",
     #' @description Open pdf file for parsing
     #'
     #' @param pdf a path to pdf or [raw] vector containing the pdf of test results
-    #' @param start the string deliminating the start of a result
-    #' @param end the string deliminating the end of a result
+    #' @param start a S3 `pdf_start` object or character for start of result
+    #' @param end a S3 `pdf_end` object or character for start of result
     #'
     #' @return A new `PDFTool` object
     initialize = \(pdf, start, end) {
+      assertthat::assert_that(inherits(start, "result_delimiter") | (inherits(start, "character") & length(start) == 1))
+      assertthat::assert_that(inherits(end, "result_delimiter") | (inherits(end, "character") & length(end) == 1))
       private$data <- pdf
       private$pdf <- pdftools::pdf_text(pdf)
+      # Detect language
       start <- private$pagesContaining(start)
       assertthat::assert_that(any(start), 
                               msg = "Not a valid pdf, doesn't appeart to contain results")
@@ -25,10 +28,11 @@ PDFTool <- R6::R6Class("PDFTool",
     #' @return vector of combined results
     getResults = \() {
       n <- nrow(private$results)
-      results <- character(n)
+      results <- data.frame(result = character(n), lang = character(n))
       for(i in 1:n) {
-        results[i] <- paste(private$getPages(private$results[i, "start"]:private$results[i, "end"]),
+        results$result[i] <- paste(private$getPages(private$results[i, "start"]:private$results[i, "end"]),
                                               collapse = "\n")
+        results$lang[i] <- private$lang[private$results[i, "start"]]
       }
       results
     },
@@ -48,6 +52,7 @@ PDFTool <- R6::R6Class("PDFTool",
     results = NULL,
     pdf = NULL,
     data = NULL,
+    lang = NULL,
     # Get specific page of text
     #
     # @param page `integer` of page desired or coerciable to integer
@@ -64,7 +69,15 @@ PDFTool <- R6::R6Class("PDFTool",
     #
     # @return  `logical` of vector corresponding to pages containing search term.
     pagesContaining = \(search) {
-      stringr::str_detect(private$pdf, stringr::coll(search))
+      detected <- logical(length(private$pdf))
+      if (!inherits(search, "result_delimiter")) names(search) <- "english"
+      for(lang in names(search)) {
+        langDet <- stringr::str_detect(private$pdf, stringr::coll(search[lang]))
+        if(is.null(private$lang)) private$lang <- character(length(private$pdf))
+        private$lang[langDet] <- lang
+        detected <- detected | langDet
+      }
+      detected
     },
     # Create new subseted pdf
     #
@@ -81,7 +94,7 @@ PDFTool <- R6::R6Class("PDFTool",
   )
 )
 
-#' Get Xpert Keyed Value
+#' Get PDF Keyed Value
 #'
 #' @details
 #' \code{keyed_ts} returns the \code{POSIXct} date/time of the keyed value in UCT/GMT time
@@ -92,19 +105,19 @@ PDFTool <- R6::R6Class("PDFTool",
 #'
 #' @return the value after the key
 keyed_value <- function(key, txt) {
-  stringr::str_extract(txt, paste0("(?<=", stringr::str_replace_all(key, "\\s", "\\\\s"), ":\\s{1,30})[:alnum:]+"))
+  stringr::str_extract(txt, paste0("(?<=", stringr::str_replace_all(paste0(key, "\\*?"), "\\s", "\\\\s"), ":\\s{1,30})[:alnum:]+"))
 }
 
 #' @rdname keyed_value
-#' @param tz [TZ] object containing either single time zone of map of time zones and machine names
+#' @param tz [TZ] object containing map of time zones and machine names or `character` of Olson Name 
+#'    (i.e. `America/New_York`) containing either single time zone
 #' @param machine_name the identifier used to lookup the time zone
-keyed_ts <- function(key, txt, tz, machine_name) {
-  browser()
+keyed_ts <- function(key, txt, tz, machine_name, tryFormat = "%m/%d/%y %H:%M:%S") {
   assertthat::assert_that(inherits(tz, "TZ"))
   value <- dplyr::tibble(val = stringr::str_extract(txt, paste0("(?<=", stringr::str_replace_all(key, "\\s", "\\\\s"),
                                                                 ":\\s{1,30})[:graph:]{8}\\s[:graph:]{8}")),
                          tz = tz$getTZ(machine_name)) %>%
-    dplyr::rowwise() %>% dplyr::mutate(val = as.POSIXct(val, tryFormats = "%m/%d/%y %H:%M:%S", tz = tz))
+    dplyr::rowwise() %>% dplyr::mutate(val = as.POSIXct(val, tryFormats = tryFormat, tz = tz))
   # Convert to UTC
   attr(value$val, "tzone") <- "GMT"
   return(value$val)

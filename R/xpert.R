@@ -15,37 +15,83 @@ Xpert <- R6::R6Class("Xpert",
     #' @importFrom magrittr %>%
     #' @return a `Xpert` R6 Object
     initialize = \(pdf, xpertTZ = Sys.timezone()){
-      private$pdf <- PDFTool$new(pdf, "Xpert HPV HR_16_18-45", "Supervisor Initial/Date")
-      xpert <-private$pdf$getResults()
-      tbl <- stringr::str_replace_all(
-        stringr::str_extract(xpert, "SAC[[:graph:]\\s\\n]+(?=\\n\\s\\-\\sDetail:)|SAC[[:graph:]\\s\\n]+(?=\\nUser:)"),
-        "(?<=HPV)\\s(?=\\d{2})", "_") %>%
-        lapply(readr::read_table, col_names = c("analyte", "ct", "end_point", "result", "probe_check")) %>%
-        lapply(dplyr::select, c("analyte", "ct", "result"))
-      private$results <- dplyr::tibble(
-        sample_id = keyed_value("Sample ID\\*?", xpert),
-        test_result =
-          stringr::str_replace_all(
-            stringr::str_extract(xpert, "(?<=Test\\sResult:\\s{1,30})HPV[[:graph:]\\s\\n]+(?=\\n\\-\\nAnalyte)"),
-            "\\n\\s{2,}", " "),
-        status = keyed_value("Status", xpert),
-        error = keyed_value("Error Status", xpert),
-        error_message = stringr::str_extract(xpert, "(?<=Errors\\n)[:graph:]+"),
-        instrument_sn = keyed_value("Instrument S/N", xpert),
-        cartridge_sn = keyed_value("Cartridge S/N\\*?", xpert),
-        reagant_lot = keyed_value("Reagent Lot ID\\*?", xpert),
-        notes = stringr::str_extract(xpert, "(?<=Notes:[^[:graph:]\r\n]{0,30})[:graph:].*(?!\n{1}])"),
-        user = stringr::str_extract(xpert, "(?<=User:[^[:graph:]\r\n]{0,30})[:graph:].*(?!\n{1}])"),
-        results = tbl) %>%
-        tidyr::unnest(cols = results) %>%
+      private$pdf <- PDFTool$new(pdf, xpert_start, xpert_end)
+      result <-private$pdf$getResults()
+      if (!inherits(xpertTZ, "TZ")) xpertTZ <- TZ$new(xpertTZ)
+      # Documents must either be in English or spanish
+      if (all(result$lang == "english")) {
+        browser()
+        tbl <- stringr::str_trim(stringr::str_replace_all(
+          stringr::str_extract(result$result, "SAC[[:graph:]\\s\\n]+(?=\\n\\s\\-\\sDetail:)|SAC[[:graph:]\\s\\n]+(?=\\nUser:)"),
+          "(?<=HPV)\\s(?=\\d{2})", "_"), "right") %>%
+          lapply(\(x) {
+            readr::read_table(x,
+                col_names = c("analyte", "ct", "end_point", "result", "probe_check"),
+                col_types = readr::cols_only(analyte = "c", ct = "d", result = "c"))
+          })
+        private$results <- dplyr::tibble(
+          sample_id = keyed_value("Sample ID?", result$result),
+          test_result =
+            stringr::str_replace_all(
+              stringr::str_extract(result$result, "(?<=Test\\sResult:\\s{1,30})HPV[[:graph:]\\s\\n]+(?=\\n\\-\\nAnalyte)"),
+              "\\n\\s{2,}", " "),
+          status = keyed_value("Status", result$result),
+          error = keyed_value("Error Status", result$result),
+          error_message = stringr::str_extract(result$result, "(?<=Errors\\n)[:graph:]+"),
+          instrument_sn = keyed_value("Instrument S/N", result$result),
+          cartridge_sn = keyed_value("Cartridge S/N", result$result),
+          reagant_lot = keyed_value("Reagent Lot ID", result$result),
+          notes = stringr::str_extract(result$result, "(?<=Notes:[^[:graph:]\r\n]{0,30})[:graph:].*(?!\n{1}])"),
+          user = stringr::str_extract(result$result, "(?<=User:[^[:graph:]\r\n]{0,30})[:graph:].*(?!\n{1}])"),
+          results = tbl) %>% 
+        dplyr::mutate(
+          start_time = keyed_ts("Start Time", result$result, xpertTZ, instrument_sn),
+          end_time = keyed_ts("End Time", result$result, xpertTZ, instrument_sn)
+        ) 
+      } else if (all(result$lang == "spanish")) {
+        tbl <- stringr::str_trim(stringr::str_replace_all(
+          stringr::str_extract(result$result,
+                               "SAC[[:graph:]\\s\\n]+(?=\\n\\s\\-\\sDetalles:)|SAC[[:graph:]\\s\\n]+(?=\\nUsuario:)"),
+              "(?<=HPV)\\s(?=\\d{2})", "_"), "right") %>%
+          lapply(\(x) {
+            readr::read_fwf(x,col_positions = readr::fwf_positions(c(1,16,32,45,54), c(15,31,44,53,NA),
+                                col_names = c("analyte", "ct", "end_point", "result", "probe_check")),
+                              col_types = readr::cols_only(analyte = "c", ct = "d", result = "c", probe_check="c"),
+                              locale = readr::locale(decimal_mark = ",")) %>%
+            dplyr::filter(!is.na(analyte)) %>%
+            dplyr::mutate(result = dplyr::case_when(
+              result == "SUPERADO" ~ "PASS",
+              result == "NEG." ~ "NEG",
+              stringr::str_detect(result, "NO VÁL") ~ "INVALID",
+              result == "NO" ~ dplyr::if_else(probe_check != "SUPERADO", "PROBE FAIL", "FAIL")
+            )) %>% dplyr::select(-probe_check)
+          })
+        private$results <- dplyr::tibble(
+          sample_id = keyed_value("ID de muestra", result$result),
+          test_result = stringr::str_replace_all(stringr::str_replace_all(stringr::str_replace_all(
+              stringr::str_extract(result$result, "(?<=Resultado:\\s{1,40})[:graph:][[:graph:]\\s\\n]+(?=\\n\\-\\nResultado\\sdel\\sanalito)"),
+              "\\n\\s{2,}", " "), "NEG.", "NEG"), "NO VÁLIDO", "INVALID"),
+          status = stringr::str_replace_all(keyed_value("Estado", result$result), "Realizado", "Done"),
+          error = stringr::str_replace_all(keyed_value("Estado de error", result$result), "Aceptar", "OK"),
+          error_message = stringr::str_replace_all(stringr::str_extract(result$result, "(?<=Errores\\n)[:graph:]+"),
+                                                   "<Ninguno>", "<None>"),
+          instrument_sn = stringr::str_extract(result$result, "(?<=Nº\\sde\\sserie\\sdel\\s{1,30})\\d+(?=\\s+instrumento:)"),
+          cartridge_sn = stringr::str_extract(result$result, 
+                           "(?<=Nº\\sde\\sserie\\sdel\\s{1,30})\\d+(?=\\s+Nº\\sde\\sserie\\sdel\\s+\\d+)"),
+          reagant_lot = keyed_value("ID del lote", result$result),
+          notes = stringr::str_extract(result$result, "(?<=Notas:[^[:graph:]\r\n]{0,30})[:graph:].*(?!\n{1}])"),
+          user = stringr::str_extract(result$result, "(?<=Usuario:[^[:graph:]\r\n]{0,30})[:graph:].*(?!\n{1}])"),
+          results = tbl) %>% 
+          dplyr::mutate(
+            start_time = keyed_ts("Hora inicio", result$result, xpertTZ, instrument_sn, "%d/%m/%y %H:%M:%S"),
+            end_time = keyed_ts("Hora finaliz\\.", result$result, xpertTZ, instrument_sn, "%d/%m/%y %H:%M:%S"),
+          ) 
+      } else stop("pdf results must be in either english or spanish and not a mix of languages")
+      private$results <- private$results %>% tidyr::unnest(cols = results) %>%
         tidyr::pivot_wider(
           names_from = analyte,
           values_from = c(ct, result),
-          names_glue = "{analyte}_{.value}"
-        ) %>% dplyr::mutate(
-          start_time = keyed_ts("Start Time", xpert, xpertTZ, instrument_sn),
-          end_time = keyed_ts("End Time", xpert, xpertTZ, instrument_sn),
-        ) %>%
+          names_glue = "{analyte}_{.value}") %>% 
         dplyr::relocate(tidyselect::starts_with(c("SAC", "HPV_16", "HPV_18", "P3", "P4", "P5")), .after="error")
       class(private$results) <- c("xpert_results", class(private$results))
     },

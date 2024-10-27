@@ -7,3 +7,5 @@
 .DS_Store
 .quarto
 docs
+data-raw
+R/ROCCHHA.R

@@ -3,18 +3,19 @@
 \name{keyed_value}
 \alias{keyed_value}
 \alias{keyed_ts}
-\title{Get Xpert Keyed Value}
+\title{Get PDF Keyed Value}
 \usage{
 keyed_value(key, txt)
 
-keyed_ts(key, txt, tz, machine_name)
+keyed_ts(key, txt, tz, machine_name, tryFormat = "\%m/\%d/\%y \%H:\%M:\%S")
 }
 \arguments{
 \item{key}{key of value to extract}
 
 \item{txt}{source of extraction}
 
-\item{tz}{\link{TZ} object containing either single time zone of map of time zones and machine names}
+\item{tz}{\link{TZ} object containing map of time zones and machine names or \code{character} of Olson Name
+(i.e. \code{America/New_York}) containing either single time zone}
 
 \item{machine_name}{the identifier used to lookup the time zone}
 }
@@ -22,7 +23,7 @@ keyed_ts(key, txt, tz, machine_name)
 the value after the key
 }
 \description{
-Get Xpert Keyed Value
+Get PDF Keyed Value
 }
 \details{
 \code{keyed_ts} returns the \code{POSIXct} date/time of the keyed value in UCT/GMT time

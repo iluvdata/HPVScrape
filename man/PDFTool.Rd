@@ -29,9 +29,9 @@ Open pdf file for parsing
 \describe{
 \item{\code{pdf}}{a path to pdf or \link{raw} vector containing the pdf of test results}
 
-\item{\code{start}}{the string deliminating the start of a result}
+\item{\code{start}}{a S3 \code{pdf_start} object or character for start of result}
 
-\item{\code{end}}{the string deliminating the end of a result}
+\item{\code{end}}{a S3 \code{pdf_end} object or character for start of result}
 }
 \if{html}{\out{</div>}}
 }
